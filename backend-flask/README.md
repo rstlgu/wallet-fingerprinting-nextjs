@@ -6,7 +6,7 @@ Un'API REST completa per identificare il software wallet utilizzato per creare t
 
 ## 🚀 Quick Start
 
-### Installazione
+### Sviluppo Locale
 ```bash
 # Clona il repository
 git clone <repository-url>
@@ -19,14 +19,23 @@ source venv/bin/activate
 # Installa dipendenze
 pip install -r requirements.txt
 
-# Avvia API
-python src/app.py
+# Avvia API (sviluppo)
+python run.py
+
+# Oppure avvia direttamente
+python app.py
 ```
 
 ### Test API
 ```bash
 # Test rapido
 curl http://localhost:5000/health
+
+# Test con API key
+curl -X POST http://localhost:5000/api/analyze/tx \
+  -H "X-API-Key: test-api-key-12345-abcdef-67890" \
+  -H "Content-Type: application/json" \
+  -d '{"txid": "7a2c087cb02a758b2d04d809f46bd5d5d46dd38492f7a3cc3cc7eded7e3ce166"}'
 
 # Test analisi transazione
 curl -X POST http://localhost:5000/api/analyze/tx \
@@ -111,24 +120,41 @@ Health check dell'API.
 wallet-fingerprinting-api/
 ├── src/
 │   ├── app.py                 # Applicazione Flask principale
-│   ├── fingerprinting.py      # Core del sistema di fingerprinting
-│   ├── fetch_txs.py          # Gestione sorgenti dati
-│   ├── bitcoin_core.py       # Interfaccia Bitcoin Core RPC
-│   ├── mempool_space.py      # Interfaccia mempool.space API
-│   ├── rpc_config.ini        # Configurazione RPC
-│   ├── api/
-│   │   ├── routes.py         # Endpoints API
-│   │   ├── services.py       # Logica di business
-│   │   └── middleware.py     # Middleware e validazione
-│   ├── models/
-│   │   └── responses.py      # Modelli per risposte
-│   └── utils/
-│       └── logger.py         # Sistema di logging
-├── tests/                    # Test suite
-├── docs/                     # Documentazione
-├── scripts/                  # Script di utilità
-├── requirements.txt          # Dipendenze Python
-└── config.env.example       # Configurazione esempio
+├── app.py                 # 🎯 Entry point per Vercel
+├── run.py                 # 🚀 Script di sviluppo locale
+├── vercel.json           # ⚙️ Configurazione Vercel
+├── requirements.txt      # 📦 Dipendenze Python
+├── config.env           # 🔧 Variabili locali
+├── env.example          # 📋 Template variabili
+├── .gitignore           # 🚫 File da ignorare
+├── README.md            # 📚 Documentazione principale
+├── DEPLOYMENT.md        # 🚀 Guida deployment
+└── src/                 # 📂 Codice sorgente
+    ├── app.py           # 🏗️ Applicazione Flask principale
+    ├── fingerprinting.py # 🔍 Core del sistema di fingerprinting
+    ├── fetch_txs.py     # 📥 Gestione sorgenti dati
+    ├── bitcoin_core.py  # 🔗 Interfaccia Bitcoin Core RPC
+    ├── mempool_space.py # 🌐 Interfaccia mempool.space API
+    ├── api/             # 🌐 Endpoints API
+    │   ├── routes.py    # 🛣️ Route principali
+    │   ├── services.py  # 🔧 Logica di business
+    │   └── middleware.py # 🛡️ Middleware e validazione
+    ├── models/          # 📊 Modelli dati
+    │   └── responses.py # 📤 Strutture risposte
+    └── utils/           # 🛠️ Utilità
+        └── logger.py    # 📝 Sistema logging
+```
+
+## 🔐 Autenticazione
+
+L'API è protetta da **API Key**. Tutti gli endpoint (eccetto `/health`, `/api/docs`, `/api/status`) richiedono autenticazione:
+
+```bash
+# Header X-API-Key
+curl -H "X-API-Key: your-api-key" https://your-api.com/api/analyze/tx
+
+# Header Authorization
+curl -H "Authorization: Bearer your-api-key" https://your-api.com/api/analyze/tx
 ```
 
 ## ⚙️ Configurazione
@@ -138,6 +164,7 @@ wallet-fingerprinting-api/
 # Flask
 FLASK_ENV=development
 SECRET_KEY=your-secret-key
+API_KEY=your-api-key-here
 PORT=5000
 
 # Logging
@@ -298,3 +325,4 @@ print(response.json())
 ---
 
 **Backend API pronto per integrazione con frontend Next.js!** 🎉
+# Deploy trigger

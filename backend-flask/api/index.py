@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Script di avvio per Wallet Fingerprinting API
+Wallet Fingerprinting API - Entry Point per Vercel
 """
 
 import os
@@ -8,22 +8,24 @@ import sys
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Carica variabili d'ambiente dal file config.env
-config_path = Path(__file__).parent / 'config.env'
+# Carica variabili d'ambiente
+config_path = Path(__file__).parent.parent / 'config.env'
 if config_path.exists():
     load_dotenv(config_path)
-    print(f"✅ Caricate variabili d'ambiente da {config_path}")
-else:
-    print(f"⚠️  File config.env non trovato in {config_path}")
 
 # Aggiungi src al path
-src_path = Path(__file__).parent / 'src'
+src_path = Path(__file__).parent.parent / 'src'
 sys.path.insert(0, str(src_path))
 
+# Importa l'app da src
+from app import create_app
+
+# Crea l'app per Vercel
+app = create_app()
+
+# Per Vercel, l'app deve essere esposta come 'app'
 if __name__ == '__main__':
-    from app import create_app
-    
-    app = create_app()
+    # Solo per sviluppo locale
     port = int(os.environ.get('PORT', 5000))
     debug = os.environ.get('FLASK_ENV') == 'development'
     

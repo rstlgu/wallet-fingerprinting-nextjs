@@ -14,7 +14,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from api.services import wallet_service
 from api.middleware import (
     validate_txid, validate_address, validate_block_hash,
-    log_api_request, log_api_response
+    log_api_request, log_api_response, validate_api_key
 )
 from models.responses import create_success_response, create_error_response
 from utils.logger import setup_logger
@@ -26,8 +26,16 @@ api_bp = Blueprint('api', __name__)
 
 @api_bp.before_request
 def before_request():
-    """Middleware per logging richieste"""
+    """Middleware per logging richieste e validazione API KEY"""
     log_api_request()
+    
+    # Valida API KEY per endpoint protetti
+    if not validate_api_key():
+        return jsonify(create_error_response(
+            error="Unauthorized",
+            message="API KEY richiesta. Invia l'API KEY nell'header X-API-Key o Authorization",
+            code=401
+        )), 401
 
 @api_bp.after_request
 def after_request(response):
@@ -207,11 +215,20 @@ def api_docs():
         'title': 'Wallet Fingerprinting API',
         'version': '1.0.0',
         'description': 'API per analisi e rilevamento wallet Bitcoin',
+        'authentication': {
+            'type': 'API Key',
+            'header': 'X-API-Key',
+            'description': 'Invia la tua API KEY nell\'header X-API-Key o Authorization'
+        },
         'endpoints': {
             'POST /api/analyze/tx': {
                 'description': 'Analizza una singola transazione',
+                'authentication': 'Required',
                 'parameters': {
                     'txid': 'string (required) - Transaction ID Bitcoin'
+                },
+                'headers': {
+                    'X-API-Key': 'string (required) - La tua API KEY'
                 },
                 'example': {
                     'txid': '7a2c087cb02a758b2d04d809f46bd5d5d46dd38492f7a3cc3cc7eded7e3ce166'
@@ -219,9 +236,13 @@ def api_docs():
             },
             'POST /api/analyze/address': {
                 'description': 'Analizza un indirizzo Bitcoin',
+                'authentication': 'Required',
                 'parameters': {
                     'address': 'string (required) - Indirizzo Bitcoin',
                     'limit': 'integer (optional) - Numero max transazioni da analizzare (default: 20)'
+                },
+                'headers': {
+                    'X-API-Key': 'string (required) - La tua API KEY'
                 },
                 'example': {
                     'address': 'bc1qynqu36tgknqvm3m5cs4e5mulj42xcju5vn8mvl',
@@ -230,9 +251,13 @@ def api_docs():
             },
             'POST /api/analyze/block': {
                 'description': 'Analizza un blocco Bitcoin',
+                'authentication': 'Required',
                 'parameters': {
                     'block_hash': 'string (optional) - Block hash (default: ultimo blocco)',
                     'num_txs': 'integer (optional) - Numero transazioni da analizzare (default: 50)'
+                },
+                'headers': {
+                    'X-API-Key': 'string (required) - La tua API KEY'
                 },
                 'example': {
                     'block_hash': '00000000000000000004bcc50688d02a74d778201a47cc704a877d1442a58431',

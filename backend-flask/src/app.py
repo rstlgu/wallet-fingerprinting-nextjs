@@ -4,7 +4,7 @@ Wallet Fingerprinting Flask API
 Backend per analisi wallet Bitcoin con frontend Next.js
 """
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 import os
 import sys
@@ -27,13 +27,15 @@ def create_app():
     # Configurazione
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key')
     app.config['JSON_SORT_KEYS'] = False
+    app.config['API_KEY'] = os.environ.get('API_KEY', 'dev-api-key-12345')
     
-    # CORS per frontend Next.js
-    CORS(app, origins=[
-        "http://localhost:3000",  # Next.js dev server
-        "http://127.0.0.1:3000",
-        "https://yourdomain.com"  # Produzione
-    ])
+    # CORS - Permette tutte le origini per hosting online
+    CORS(app, 
+         origins="*",  # Permette tutte le origini
+         supports_credentials=False,  # Non necessario per API KEY
+         allow_headers=['Content-Type', 'Authorization', 'X-API-Key', 'X-Requested-With'],
+         methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+    )
     
     # Setup logging
     logger = setup_logger()
@@ -55,6 +57,16 @@ def create_app():
             'timestamp': datetime.utcnow().isoformat(),
             'version': '1.0.0'
         })
+    
+    # CORS preflight handler
+    @app.before_request
+    def handle_preflight():
+        if request.method == "OPTIONS":
+            response = make_response()
+            response.headers.add("Access-Control-Allow-Origin", "*")
+            response.headers.add('Access-Control-Allow-Headers', "Content-Type, Authorization, X-API-Key, X-Requested-With")
+            response.headers.add('Access-Control-Allow-Methods', "GET, POST, PUT, DELETE, OPTIONS")
+            return response
     
     # Root endpoint
     @app.route('/')

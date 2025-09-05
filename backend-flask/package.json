@@ -1,0 +1,13 @@
+{
+  "name": "wallet-fingerprinting-api",
+  "version": "1.0.0",
+  "description": "Backend Flask per analisi e rilevamento wallet Bitcoin",
+  "main": "api/index.py",
+  "scripts": {
+    "dev": "python run.py",
+    "start": "python app.py"
+  },
+  "keywords": ["bitcoin", "wallet", "fingerprinting", "flask", "api"],
+  "author": "Your Name",
+  "license": "MIT"
+}

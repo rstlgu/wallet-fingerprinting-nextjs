@@ -1,0 +1,60 @@
+{
+  "manifest_version": 3,
+  "name": "Bitcoin Wallet Analyzer",
+  "version": "1.0.0",
+  "description": "Analizza wallet Bitcoin direttamente da Chainalysis e altri block explorer",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://*.chainalysis.com/*",
+    "https://*.mempool.space/*",
+    "https://*.blockstream.info/*",
+    "https://*.blockchain.info/*",
+    "http://localhost:5000/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.chainalysis.com/*",
+        "https://*.mempool.space/*",
+        "https://*.blockstream.info/*",
+        "https://*.blockchain.info/*"
+      ],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Bitcoin Wallet Analyzer",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "wallet-analyzer.html",
+        "icons/*.png"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

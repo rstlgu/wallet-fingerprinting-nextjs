@@ -2,7 +2,7 @@
 Middleware per gestione errori e logging
 """
 
-from flask import request, jsonify
+from flask import request, jsonify, current_app
 from datetime import datetime
 import traceback
 import sys
@@ -111,3 +111,45 @@ def log_api_response(status_code: int, response_time: float):
         status_code=status_code,
         response_time=response_time
     )
+
+def validate_api_key():
+    """Valida l'API KEY dalla richiesta"""
+    # Endpoint che non richiedono autenticazione
+    public_endpoints = ['/health', '/', '/api/docs', '/api/redoc', '/api/swagger-ui', '/api/status']
+    
+    # Se è un endpoint pubblico, non validare l'API KEY
+    if request.path in public_endpoints:
+        return True
+    
+    # Controlla se l'API KEY è presente
+    api_key = request.headers.get('X-API-Key') or request.headers.get('Authorization')
+    
+    # Rimuovi "Bearer " se presente
+    if api_key and api_key.startswith('Bearer '):
+        api_key = api_key[7:]
+    
+    if not api_key:
+        return False
+    
+    # Confronta con l'API KEY configurata
+    expected_api_key = current_app.config.get('API_KEY')
+    if not expected_api_key:
+        logger.error("API_KEY non configurata nel server")
+        return False
+    
+    return api_key == expected_api_key
+
+def require_api_key():
+    """Decorator per richiedere API KEY"""
+    def decorator(f):
+        def decorated_function(*args, **kwargs):
+            if not validate_api_key():
+                return jsonify(create_error_response(
+                    error="Unauthorized",
+                    message="API KEY richiesta. Invia l'API KEY nell'header X-API-Key o Authorization",
+                    code=401
+                )), 401
+            return f(*args, **kwargs)
+        decorated_function.__name__ = f.__name__
+        return decorated_function
+    return decorator

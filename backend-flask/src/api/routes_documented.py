@@ -381,3 +381,4 @@ api.add_namespace(address_ns, path='/address')
 api.add_namespace(transaction_ns, path='/transaction')
 api.add_namespace(block_ns, path='/block')
 api.add_namespace(fingerprint_ns, path='/fingerprint')
+

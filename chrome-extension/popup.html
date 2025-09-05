@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bitcoin Wallet Analyzer</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      width: 350px;
+      min-height: 500px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: #ffffff;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #f39800 0%, #f7941d 100%);
+      color: #000;
+      padding: 20px;
+      text-align: center;
+    }
+    
+    .header h1 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .header p {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+    
+    .content {
+      padding: 20px;
+    }
+    
+    .section {
+      margin-bottom: 24px;
+    }
+    
+    .section h3 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #f39800;
+    }
+    
+    .form-group {
+      margin-bottom: 16px;
+    }
+    
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: #ccc;
+    }
+    
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      font-size: 13px;
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #f39800;
+      box-shadow: 0 0 0 2px rgba(243, 152, 0, 0.2);
+    }
+    
+    .form-group input::placeholder {
+      color: #999;
+    }
+    
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .checkbox-group input[type="checkbox"] {
+      width: auto;
+      margin: 0;
+    }
+    
+    .status {
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .status.connected {
+      background: rgba(76, 175, 80, 0.2);
+      border: 1px solid rgba(76, 175, 80, 0.3);
+      color: #4CAF50;
+    }
+    
+    .status.disconnected {
+      background: rgba(244, 67, 54, 0.2);
+      border: 1px solid rgba(244, 67, 54, 0.3);
+      color: #F44336;
+    }
+    
+    .btn {
+      background: linear-gradient(135deg, #f39800 0%, #f7941d 100%);
+      color: #000;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 100%;
+    }
+    
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(243, 152, 0, 0.3);
+    }
+    
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    .footer {
+      padding: 16px 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      text-align: center;
+    }
+    
+    .footer p {
+      font-size: 11px;
+      color: #999;
+      margin-bottom: 8px;
+    }
+    
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+    }
+    
+    .footer-links a {
+      color: #f39800;
+      text-decoration: none;
+      font-size: 11px;
+    }
+    
+    .footer-links a:hover {
+      text-decoration: underline;
+    }
+    
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top: 2px solid #f39800;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🔍 Bitcoin Wallet Analyzer</h1>
+    <p>Analizza wallet Bitcoin direttamente da Chainalysis</p>
+  </div>
+  
+  <div class="content">
+    <!-- Status -->
+    <div id="status" class="status disconnected">
+      <span id="status-icon">❌</span>
+      <span id="status-text">Disconnesso dall'API</span>
+    </div>
+    
+    <!-- Settings -->
+    <div class="section">
+      <h3>⚙️ Configurazione</h3>
+      
+      <div class="form-group">
+        <label for="apiUrl">URL API Backend:</label>
+        <input type="text" id="apiUrl" placeholder="http://localhost:5000">
+      </div>
+      
+      <div class="form-group">
+        <label for="analysisDepth">Profondità Analisi:</label>
+        <select id="analysisDepth">
+          <option value="1">1 - Veloce</option>
+          <option value="2">2 - Standard</option>
+          <option value="3" selected>3 - Completa</option>
+          <option value="4">4 - Approfondita</option>
+          <option value="5">5 - Massima</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <div class="checkbox-group">
+          <input type="checkbox" id="autoAnalyze" checked>
+          <label for="autoAnalyze">Analisi automatica al click</label>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <div class="checkbox-group">
+          <input type="checkbox" id="includePatterns" checked>
+          <label for="includePatterns">Includi analisi pattern</label>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <div class="checkbox-group">
+          <input type="checkbox" id="showNotifications" checked>
+          <label for="showNotifications">Mostra notifiche</label>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Actions -->
+    <div class="section">
+      <h3>🔧 Azioni</h3>
+      
+      <button id="testConnection" class="btn">
+        <span id="testText">Testa Connessione</span>
+        <span id="testSpinner" class="spinner hidden"></span>
+      </button>
+      
+      <button id="saveSettings" class="btn btn-secondary" style="margin-top: 8px;">
+        Salva Impostazioni
+      </button>
+    </div>
+    
+    <!-- Quick Test -->
+    <div class="section">
+      <h3>🧪 Test Rapido</h3>
+      
+      <div class="form-group">
+        <label for="testTxid">Testa con TXID:</label>
+        <input type="text" id="testTxid" placeholder="Inserisci un TXID Bitcoin">
+      </div>
+      
+      <button id="testAnalysis" class="btn btn-secondary">
+        Analizza Transazione
+      </button>
+    </div>
+  </div>
+  
+  <div class="footer">
+    <p>Versione 1.0.0</p>
+    <div class="footer-links">
+      <a href="#" id="openDocs">Documentazione</a>
+      <a href="#" id="openSettings">Impostazioni Avanzate</a>
+    </div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
