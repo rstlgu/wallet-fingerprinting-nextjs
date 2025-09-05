@@ -5,7 +5,7 @@ Un progetto completo per l'analisi e il fingerprinting di wallet Bitcoin, compos
 ## 🏗️ Struttura del Progetto
 
 ### Frontend (Next.js 15)
-- **Path**: `nextjs-15-starter-shadcn/`
+- **Path**: `frontend-nextjs/`
 - **Tech Stack**: Next.js 15, React, TypeScript, Tailwind CSS, Shadcn UI
 - **Features**:
   - Interfaccia moderna e responsive per l'analisi dei wallet
@@ -14,7 +14,7 @@ Un progetto completo per l'analisi e il fingerprinting di wallet Bitcoin, compos
   - Analisi in tempo reale delle transazioni Bitcoin
 
 ### Backend API (Python)
-- **Path**: `wallet-fingerprinting-api/`
+- **Path**: `backend-flask/`
 - **Tech Stack**: Python, Flask, Bitcoin Core RPC
 - **Features**:
   - API RESTful per l'analisi di indirizzi e transazioni Bitcoin
@@ -31,14 +31,14 @@ Un progetto completo per l'analisi e il fingerprinting di wallet Bitcoin, compos
 
 ### Frontend Setup
 ```bash
-cd nextjs-15-starter-shadcn
+cd frontend-nextjs
 npm install
 npm run dev
 ```
 
 ### Backend Setup
 ```bash
-cd wallet-fingerprinting-api
+cd backend-flask
 python -m venv venv
 source venv/bin/activate  # Linux/Mac
 pip install -r requirements.txt
@@ -47,9 +47,9 @@ python run.py
 
 ## 📚 Documentation
 
-- [Frontend Integration Guide](wallet-fingerprinting-api/frontend-integration.md)
-- [API Documentation](wallet-fingerprinting-api/README.md)
-- [Wallet Analysis README](nextjs-15-starter-shadcn/README-WALLET-ANALYSIS.md)
+- [Frontend Integration Guide](backend-flask/frontend-integration.md)
+- [API Documentation](backend-flask/README.md)
+- [Wallet Analysis README](frontend-nextjs/README-WALLET-ANALYSIS.md)
 
 ## 🛠️ Development
 
