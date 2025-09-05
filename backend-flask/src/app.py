@@ -15,6 +15,8 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from api.routes import api_bp
 from api.sse_routes import sse_bp
+from api.docs_config import docs_bp
+from api.swagger_routes import swagger_bp
 from api.middleware import error_handler
 from utils.logger import setup_logger
 
@@ -39,6 +41,8 @@ def create_app():
     # Registra blueprint
     app.register_blueprint(api_bp, url_prefix='/api')
     app.register_blueprint(sse_bp, url_prefix='/sse')
+    app.register_blueprint(docs_bp)  # docs_bp ha già prefix='/api'
+    app.register_blueprint(swagger_bp, url_prefix='/api')
     
     # Middleware per gestione errori
     app.register_error_handler(Exception, error_handler)
@@ -60,10 +64,13 @@ def create_app():
             'version': '1.0.0',
             'endpoints': {
                 'health': '/health',
-                'analyze_tx': '/api/analyze/tx',
-                'analyze_address': '/api/analyze/address',
-                'analyze_block': '/api/analyze/block',
-                'docs': '/api/docs'
+                'analyze_tx': '/api/transaction/analyze',
+                'analyze_address': '/api/address/analyze',
+                'analyze_block': '/api/block/analyze',
+                'docs': '/api/docs',
+                'swagger_ui': '/api/docs/',
+                'swagger_custom': '/api/swagger-ui',
+                'redoc': '/api/redoc'
             }
         })
     
